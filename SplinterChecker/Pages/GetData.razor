@@ -1,0 +1,149 @@
+﻿@page "/getdata"
+
+@using System.Net.Http
+@using System.Diagnostics
+@using Newtonsoft.Json
+@using System.Linq
+
+<h1>Get Data from API</h1>
+
+<label for="username">Username:</label>
+<input type="text" id="username" @bind-value="Username" />
+
+<button @onclick="FetchData">Get Data</button>
+
+@if (DailyQuantities != null)
+{
+<h3>Result:</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Username</th>
+            <th>Type</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dailyQuantity in DailyQuantities)
+        {
+            <tr>
+                <td>@dailyQuantity.Date.ToShortDateString()</td>
+                <td>@dailyQuantity.Username</td>
+                <td>@dailyQuantity.Type</td>
+                <td>@dailyQuantity.Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<style>
+    body {
+        background-color: #1f1f1f;
+        color: #fff;
+    }
+
+    .table {
+        background-color: #333;
+        color: #fff;
+    }
+
+    th {
+        background-color: #4CAF50;
+        color: #fff;
+    }
+
+    tr:nth-child(even) {
+        background-color: #222;
+    }
+
+    tr:hover {
+        background-color: #444;
+    }
+</style>
+}
+
+@code {
+    private const string ApiEndpoint = "https://splinterforge.io/users/getScTx";
+
+    private string Username { get; set; }
+    private List<DailyQuantity> DailyQuantities { get; set; }
+
+    private async Task FetchData()
+    {
+        try
+        {
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync($"{ApiEndpoint}?user={Username}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var transactions = JsonConvert.DeserializeObject<List<Transaction>>(content);
+
+                    // Group transactions by username, type, and date
+                    DailyQuantities = transactions
+                        .GroupBy(t => new { t.Username, t.Type, Date = DateTime.Parse(t.Timestamp).Date })
+                        .Select(g => new DailyQuantity { Date = g.Key.Date, Username = g.Key.Username, Type = g.Key.Type, Quantity = g.Sum(t => t.Qty) })
+                        .ToList();
+
+                    // Debugging output
+                    Debug.WriteLine($"Response: {content}");
+                    Debug.WriteLine($"DailyQuantities count: {DailyQuantities.Count}");
+                }
+                else
+                {
+                    throw new HttpRequestException($"Failed with status code {response.StatusCode}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private class Transaction
+    {
+        public string Username { get; set; }
+        public string Memo { get; set; }
+        [JsonConverter(typeof(DecimalConverter))]
+        public decimal Qty { get; set; }
+        public string Type { get; set; }
+        public string Timestamp { get; set; }
+    }
+
+    private class DecimalConverter : JsonConverter
+    {
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(decimal);
+        }
+
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            if (decimal.TryParse(reader.Value.ToString(), out decimal result))
+            {
+                return result;
+            }
+            else
+            {
+                return 0m; // default value if input string cannot be parsed
+            }
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            writer.WriteValue(value);
+        }
+    }
+
+    private class DailyQuantity
+    {
+        public DateTime Date { get; set; }
+        public string Username { get; set; }
+        public string Type { get; set; }
+        public decimal Quantity { get; set; }
+    }
+}
