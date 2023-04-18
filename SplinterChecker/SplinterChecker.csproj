@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="css\getdata.css" />
+    <Content Include="cssStyles\getdata.css" />
   </ItemGroup>
 
   <ItemGroup>
