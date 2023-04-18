@@ -1,10 +1,13 @@
 ﻿<!-- HTML Section -->
+<link rel="stylesheet" href="~/css/getdata.css" />
+
 @page "/getdata"
 
 @using System.Net.Http
 @using System.Diagnostics
 @using Newtonsoft.Json
 @using System.Linq
+@using SplinterChecker.Models
 
 <h1>Get Data from API</h1>
 
@@ -47,32 +50,6 @@
         </tbody>
     </table>
 }
-
-
-<style>
-    body {
-        background-color: #1f1f1f;
-        color: #fff;
-    }
-
-    .table {
-        background-color: #333;
-        color: #fff;
-    }
-
-    th {
-        background-color: #4CAF50;
-        color: #fff;
-    }
-
-    tr:nth-child(even) {
-        background-color: #222;
-    }
-
-    tr:hover {
-        background-color: #444;
-    }
-</style>
 
 <!-- Main Code Section -->
 @code {
@@ -130,46 +107,4 @@
         SelectedType = e.Value.ToString();
     }
 
-    private class Transaction
-    {
-        public string Username { get; set; }
-        public string Memo { get; set; }
-        [JsonConverter(typeof(DecimalConverter))]
-        public decimal Qty { get; set; }
-        public string Type { get; set; }
-        public string Timestamp { get; set; }
-    }
-
-    private class DecimalConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(decimal);
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            if (decimal.TryParse(reader.Value.ToString(), out decimal result))
-            {
-                return result;
-            }
-            else
-            {
-                return 0m; // default value if input string cannot be parsed
-            }
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            writer.WriteValue(value);
-        }
-    }
-
-    private class DailyQuantity
-    {
-        public DateTime Date { get; set; }
-        public string Username { get; set; }
-        public string Type { get; set; }
-        public decimal Quantity { get; set; }
-    }
 }
