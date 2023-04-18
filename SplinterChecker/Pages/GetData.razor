@@ -1,4 +1,4 @@
-﻿<!-- HTLM Section -->
+﻿<!-- HTML Section -->
 @page "/getdata"
 
 @using System.Net.Http
@@ -21,12 +21,21 @@
             <tr>
                 <th>Date</th>
                 <th>Username</th>
-                <th>Type <input id="typeFilter" type="text"></th>
+                <th>
+                    Type
+                    <select @onchange="FilterByType">
+                        <option value="">All</option>
+                        @foreach (var type in Types)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </select>
+                </th>
                 <th>Quantity</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var dailyQuantity in DailyQuantities.OrderByDescending(q => q.Date))
+            @foreach (var dailyQuantity in DailyQuantities.Where(q => string.IsNullOrEmpty(SelectedType) || q.Type == SelectedType).OrderByDescending(q => q.Date))
             {
                 <tr>
                     <td>@dailyQuantity.Date.ToShortDateString()</td>
@@ -73,7 +82,8 @@
 
     private string Username { get; set; }
     private List<DailyQuantity> DailyQuantities { get; set; }
-    private List<DailyQuantity> FilteredDailyQuantities { get; set; }
+    private List<string> Types { get; set; }
+    private string SelectedType { get; set; }
 
     private async Task FetchData()
     {
@@ -94,8 +104,8 @@
                         .Select(g => new DailyQuantity { Date = g.Key.Date, Username = g.Key.Username, Type = g.Key.Type, Quantity = g.Sum(t => t.Qty) })
                         .ToList();
 
-                    // Set the filtered data to the same as the unfiltered data by default
-                    FilteredDailyQuantities = DailyQuantities;
+                    // Get list of unique types
+                    Types = DailyQuantities.Select(q => q.Type).Distinct().OrderBy(t => t).ToList();
 
                     // Debugging output
                     Debug.WriteLine($"Response: {content}");
@@ -115,18 +125,9 @@
         }
     }
 
-    private void FilterData(string searchTerm)
+    private void FilterByType(ChangeEventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(searchTerm))
-        {
-            // If the search term is null or empty, set the filtered data to the same as the unfiltered data
-            FilteredDailyQuantities = DailyQuantities;
-        }
-        else
-        {
-            // Filter the data by username or type containing the search term
-            FilteredDailyQuantities = DailyQuantities.Where(q => q.Username.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || q.Type.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
-        }
+        SelectedType = e.Value.ToString();
     }
 
     private class Transaction
@@ -172,4 +173,3 @@
         public decimal Quantity { get; set; }
     }
 }
-
