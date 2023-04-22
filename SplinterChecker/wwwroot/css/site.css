@@ -4,6 +4,31 @@ html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
+/*test*/
+body {
+    background-color: #1f1f1f;
+    color: #fff;
+}
+
+.table {
+    background-color: #333;
+    color: #fff;
+}
+
+th {
+    background-color: #4CAF50;
+    color: #fff;
+}
+
+tr:nth-child(even) {
+    background-color: #222;
+}
+
+tr:hover {
+    background-color: #444;
+}
+
+
 h1:focus {
     outline: none;
 }
