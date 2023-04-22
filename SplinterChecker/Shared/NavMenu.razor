@@ -1,21 +1,35 @@
-﻿
+﻿<div class="sidebar">
+    <div class="sidebar-header">
+        <h3>Splinter Checker</h3>
+    </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-    </nav>
+    <div class="nav-menu-items">
+        <ul class="nav-menu-list">
+            <li>
+                <NavLink class="nav-link" href="/" Match="NavLinkMatch.All">
+                    <span class="nav-icon">
+                        <i class="fas fa-home"></i>
+                    </span>
+                    <span class="nav-text">Home</span>
+                </NavLink>
+            </li>
+            <li>
+                <NavLink class="nav-link" href="/getdata" Match="NavLinkMatch.All">
+                    <span class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </span>
+                    <span class="nav-text">Get Data</span>
+                </NavLink>
+            </li>
+        </ul>
+    </div>
 </div>
-
 
 
 @code {
     private bool collapseNavMenu = true;
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    private string? NavMenuCssClass => collapseNavMenu ? "sidebar-collapse" : null;
 
     private void ToggleNavMenu()
     {
