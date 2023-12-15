@@ -18,7 +18,26 @@ body {
     font-family: 'Montserrat', sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
+    padding:20px 10px;
 }
+
+
+.small-input {
+    width: 88px; /* Adjust this value to change the width */
+}
+
+
+.sidebar {
+    background-image: none;
+    background-color: #262626;
+    width: 100px; /* Adjust the width of the sidebar */
+}
+
+.main {
+    padding-left: 50px; /* Add space before the content */
+    padding-top: 20px ;
+}
+
 
 a {
     color: var(--text-color);
@@ -63,38 +82,30 @@ h6 {
 .table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
+    margin: 50px 0;
+    text-align: center; /* Center-align content within th and td */
 }
 
     .table th,
     .table td {
         padding: 10px;
-        border: 1px solid var(--secondary-color);
+        vertical-align: middle; /* Align content vertically in th and td */
+        text-align: center; /* Center-align content */
     }
-
-    .table th {
-        background-color: var(--secondary-color-light);
-    }
-.navbar {
-    background: var(--secondary-color);
-    color: var(--text-color-light);
-    box-shadow: 0px 4px 5px rgba(0, 0, 0, 0.25);
-}
-
-.navbar-toggler-icon {
-    color: var(--text-color-light);
+.nav-item {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px; /* Adds space between items */
 }
 
 .nav-link {
+    width: 150px; /* Adjust the width if needed */
+    text-align: center !important;
     color: var(--text-color-light) !important;
     text-transform: uppercase;
-    font-weight: 500;
-}
-
-.navbar-brand {
-    color: var(--text-color-light) !important;
-    font-size: 20px;
-    font-weight: 600;
+    font-weight: 1000;
+    display: block;
+    padding: 10px;
 }
 
 .nav-item:hover .nav-link {

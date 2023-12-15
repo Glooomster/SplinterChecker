@@ -2,16 +2,32 @@
 
 <h2>Old Boss Check</h2>
 
+
+
 <div class="form-group row">
-    <div class="col-xs-2">
-        <label for="tier">Boss Tier (1, 2, 3, 4)</label>
-        <input class="form-control" @bind="@bossTier" />
+    <div class="col-xs-6">
+        <label for="tier">Boss Tier: </label>
+        <select class="form-control form-control-sm" @bind="@selectedTier">
+            <option value="1">Bronze</option>
+            <option value="2">Silver</option>
+            <option value="3">Gold</option>
+            <option value="4">Diamond</option>
+        </select>
     </div>
-    <div class="col-xs-2">
-        <label for="depth">Depth:</label>
-        <input class="form-control" @bind="@bossDepth" />
+    <br />
+    <div class="col-xs-6">
+        <label for="depth">Depth: </label>
+        <input class="form-control form-control-sm small-input" @bind="@bossDepth" />
     </div>
 </div>
+<br />
+
+
+
+
+
+<br />
+
 <br />
 <div class="text-center panel-body">
     <button @onclick="CheckOldBoss" class="btn btn-sm btn-primary">Check old boss</button>
@@ -65,15 +81,16 @@
 }
 
 @code {
-    private string bossTier;
-    private string bossDepth;
+    private string selectedTier = "1"; // Initialize to the default tier value
+    private string bossDepth = "1"; // Initialize to the default depth value
+
     private ExpBossModel bossStandings;
 
 
     private async Task CheckOldBoss()
     {
         using var httpClient = new HttpClient();
-        var response = await httpClient.GetAsync($"https://splinterforge.io/boss/getOldBosses?depth={bossDepth}&tier={bossTier}");
+        var response = await httpClient.GetAsync($"https://splinterforge.io/boss/getOldBosses?depth={bossDepth}&tier={selectedTier}");
         if (response.IsSuccessStatusCode)
         {
             var apiResponse = await response.Content.ReadAsStringAsync();
