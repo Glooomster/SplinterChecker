@@ -1,0 +1,87 @@
+﻿@page "/oldbosscheck"
+
+<h2>Old Boss Check</h2>
+
+<div class="form-group row">
+    <div class="col-xs-2">
+        <label for="tier">Boss Tier (1, 2, 3, 4)</label>
+        <input class="form-control" @bind="@bossTier" />
+    </div>
+    <div class="col-xs-2">
+        <label for="depth">Depth:</label>
+        <input class="form-control" @bind="@bossDepth" />
+    </div>
+</div>
+<br />
+<div class="text-center panel-body">
+    <button @onclick="CheckOldBoss" class="btn btn-sm btn-primary">Check old boss</button>
+</div>
+
+@if (bossStandings != null)
+{
+    <h3>Old Boss Standings</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Player</th>
+                <th>Damage</th>
+                <th>Fights</th>
+                <th>Reward</th>
+                <!-- Add other headers as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int position = 0;
+            }
+            @foreach (var standing in bossStandings.boss.standings)
+            {
+                <tr>
+                    <td>@(++position)</td>
+                    <td>@standing.player</td>
+                    <td>@standing.dmg</td>
+                    <td>@standing.fights</td>
+                    <td>
+                        @if (standing.reward != null && standing.reward.Length > 0)
+                        {
+                            @foreach (var reward in standing.reward)
+                            {
+                                <span>@reward</span>
+
+                                <br />
+                            }
+                        }
+                        else
+                        {
+                            <span>No rewards</span>
+                        }
+                    </td>
+                    <!-- Add other fields accordingly -->
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private string bossTier;
+    private string bossDepth;
+    private ExpBossModel bossStandings;
+
+
+    private async Task CheckOldBoss()
+    {
+        using var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync($"https://splinterforge.io/boss/getOldBosses?depth={bossDepth}&tier={bossTier}");
+        if (response.IsSuccessStatusCode)
+        {
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            bossStandings = JsonConvert.DeserializeObject<ExpBossModel>(apiResponse);
+        }
+        else
+        {
+            // Handle error if API call fails
+        }
+    }
+}

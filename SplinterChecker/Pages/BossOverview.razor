@@ -1,0 +1,88 @@
+﻿@page "/bossoverview"
+@inject NavigationManager NavigationManager
+
+
+<h1>Boss Overview</h1>
+
+@if (bossModels != null)
+{
+    <table class="table table-sm  m-2 text-light">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Name</th>
+                <th>Spawned</th>
+                <th>Life Left</th>
+                <th>%</th>
+                <th>Search</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in bossModels.OrderBy(r => r.type))
+            {
+                string lifeLeft = "";
+                string lifeLeftPercent = "";
+                float life = (@r.stats.health / @r.ogStats.health * 100);
+
+                if (life > 0)
+                {
+                    lifeLeftPercent = life.ToString("#.##") + "%";
+                    lifeLeft = @r.stats.health.ToString("#,###,###");
+                }
+
+                else
+                    lifeLeftPercent = "Death";
+
+                <tr>
+                    <td>@r.type</td>
+                    <td>@r.name</td>
+                    <td>@r.spawned</td>
+                    <td>@lifeLeft</td>
+                    <td>@lifeLeftPercent</td>
+                    <td>
+                        <NavLink href="@($"checkrank/{r.id}")" class="btn btn-sm btn-secondary">Check</NavLink>
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+@code {
+    IEnumerable<Models.BossModel> bossModels;
+    string bossTier;
+    string bossDepth;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchBossData();
+    }
+
+    private async Task FetchBossData()
+    {
+        using var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync("https://splinterforge.io/boss/getBosses");
+        if (response.IsSuccessStatusCode)
+        {
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            bossModels = JsonConvert.DeserializeObject<List<Models.BossModel>>(apiResponse);
+        }
+        else
+        {
+            // Handle error if API call fails
+        }
+    }
+
+    private void CheckTeamResults(string id)
+    {
+        NavigationManager.NavigateTo($"/checkrank?id={id}");
+    }
+
+    private void CheckOldBoss()
+    {
+        // Handle checking old boss logic here
+        // You can use bossTier and bossDepth variables here
+    }
+    }

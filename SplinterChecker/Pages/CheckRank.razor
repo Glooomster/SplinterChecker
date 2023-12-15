@@ -1,0 +1,60 @@
+﻿@page "/checkrank/{id}"
+
+<h2>Check Rank</h2>
+
+@if (TeamResults != null)
+{
+    <table class="table text-light m-2">
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Name</th>
+                <th>Dmg</th>
+                <th>Fights</th>
+                <th>Reward</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int position = 0;
+            }
+            @foreach (var r in TeamResults)
+            {
+                <tr>
+                    <td>@(++position)</td>
+                    <td>@r.player</td>
+                    <td>@r.dmg</td>
+                    <td>@r.fights</td>
+                    <td>@r.reward</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+    List<SplinterChecker.Models.TeamResults> TeamResults;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await FetchTeamResults();
+    }
+
+    private async Task FetchTeamResults()
+    {
+        using var httpClient = new HttpClient();
+        var response = await httpClient.GetAsync("https://splinterforge.io/boss/getBossLeaderboard?id=" + Id);
+        if (response.IsSuccessStatusCode)
+        {
+            var apiResponse = await response.Content.ReadAsStringAsync();
+            TeamResults = JsonConvert.DeserializeObject<List<SplinterChecker.Models.TeamResults>>(apiResponse);
+        }
+        else
+        {
+            // Handle error if API call fails
+        }
+    }
+
+}

@@ -74,7 +74,7 @@
         {
             using (var client = new HttpClient())
             {
-                var response = await client.GetAsync($"{ApiEndpoint}?user={Username}");
+                var response = await client.GetAsync($"{ApiEndpoint}?user={Username.ToLower()}");
 
                 if (response.IsSuccessStatusCode)
                 {
